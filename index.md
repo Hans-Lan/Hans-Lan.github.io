@@ -4,16 +4,11 @@ lang: zh_CN
 
 # 电设软件
 
-
-
 ## 1. 基础硬件控制
 
 ### 电机驱动
 
-
-
-  <div align=left>  <img src="img\1571387948131.png" alt="1571387948131" style="zoom:10%;" />
-
+<div align=left><img src="img\1571387948131.png" alt="1571387948131" style="zoom:10%;" /></div>
 
 - **控制引脚定义：**
 
