@@ -6,32 +6,40 @@ lang: zh_CN
 
 ## 1. 基础硬件控制
 
+### Arduino 引脚
+
+PWM： 2-13；44-46；4&13 (980 Hz) others(490 Hz).
+
+The PWM outputs generated on **pins 5 and 6** will have higher-than-expected duty cycles. This is because of interactions with the `millis()` and `delay()` functions, which share the same internal timer used to generate those PWM outputs. This will be noticed mostly on low duty-cycle settings (e.g. 0 - 10) and may result in a value of 0 not fully turning off the output on **pins 5** and **6**. 
+
+外部中断：  2 (int 0), 3 (int 1). 18 (int 5), 19 (int 4), 20 (int 3), and 21 (int 2).
+
+ SPI: 50 (MISO), 51 (MOSI), 52 (SCK), 53 (SS).  
+
+ LED: 13.  
+
 ### 电机驱动
 
-<div align=left><img src="img\1571387948131.png" alt="1571387948131" style="zoom:10%;" /></div>
+<img src="img\ourvehicle.jpg" alt="ourvehicle" style="zoom:40%;" />
 
 - **控制引脚定义：**
 
-| 车轮 | 旋向控制（pin1，pin2） | PWM波输出 |
-| :--: | :--------------------: | :-------: |
-| 左前 |       （46，47）       |     2     |
-| 右前 |       （48，49）       |     3     |
-| 左后 |       （50，51）       |     5     |
-| 右后 |       （52，53）       |     6     |
+| 车轮 | 旋向控制（pin1，pin2） |
+| :--: | :--------------------: |
+| 左前 |        （7，8）        |
+| 右前 |       （9，10）        |
+| 左后 |       （11，12）       |
+| 右后 |       （44，45）       |
 
 ```c
-static int mot_FL1 = 46;
-static int mot_FL2 = 47;
-static int mot_FR1 = 48;
-static int mot_FR2 = 49;
-static int mot_BL1 = 50;
-static int mot_BL2 = 51;
-static int mot_BR1 = 52;
-static int mot_BR2 = 53;
-static int pwm_fl = 2;
-static int pwm_fr = 3;
-static int pwm_bl = 5;
-static int pwm_br = 6;
+static int pwm_fl1 = 7;
+static int pwm_fl2 = 8;
+static int pwm_fr1 = 9;
+static int pwm_fr2 = 10;
+static int pwm_bl1 = 11;
+static int pwm_bl2 = 12;
+static int pwm_br1 = 44;
+static int pwm_br2 = 45;
 ```
 
 注：PWM 频率为490 Hz
@@ -74,7 +82,7 @@ void run_r(int pin,int pwm,int value)
 void stop(int pin,int pwm)
 {
     digitalWrite(pin,LOW);
-    digitalWrite(pin,LOW);
+    digitalWrite(pin+1,LOW);
     analogWrite(pwm,0);
 }
 
@@ -137,13 +145,47 @@ void DIAG(int angle)
 
 
 
+
+
 ## 3. 控制算法
 
 ### 循迹
 
 
 
-### 寻路&避障
+### 寻路
+
+1. **交叉点计数的实现**
+
+   迷宫区域内无位置信息，需要借助检测黑线交点并计数实现位置信息的更新。
+
+   两大**关键**：全向移动小车如何识别交叉点；如何更好地避免重复计数
+
+   
+
+   **交叉点识别**
+
+   正常寻迹时，只有中间的红外管检测到黑线，当全部红外管检测到黑线时，可认为**车头**到达了交叉点，但我们必须找到车中心到达交叉点的时刻，（因为我们的车辆是全向移动，前进方向的变换在交点处进行）车中心到达交叉点可用两侧传感器进行。
+
+   为了使车辆能够更好地转换状态，需要在交叉点处停车。具体实现是，车头检测到交点后先减速，直至中心到达，车辆平稳停车。
+
+   
+
+   **避免重复计数**
+
+   如果每个循环周期都读取一次传感器数据，则在经过黑线交点时应有多个循环对应检测到交点的状态，为避免重复计数，同时也是为了避免路面或传感器等不理想因素导致的错误信号，下面设计两种方法。
+
+   1. 基于加速度计
+
+      若检测到交点，检查加速度计在此时前进方向的位移积分，若此位移大致为一格的长度，可认为是交点，并且随即将积分值置0
+
+   2. 基于两次检测
+
+      
+
+   
+
+   
 
 
 
