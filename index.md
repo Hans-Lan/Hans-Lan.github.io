@@ -143,7 +143,21 @@ void DIAG(int angle)
 
 ### 光电模块
 
+引脚定义如下：
 
+```c
+//光电信号引脚定义
+//1，2，3代表左中右。0代表旁路传感器
+//并排三路传感器端为“方向舵”, 单路传感器为交点前向探测器
+static int le_f1 = 46
+static int le_f2 = 47
+static int le_f3 = 48
+static int le_b0 = 49
+static int le_l1 = 50
+static int le_l2 = 51
+static int le_l3 = 52
+static int le_r0 = 53
+```
 
 
 
@@ -189,7 +203,9 @@ void DIAG(int angle)
 
 3. **导航**
 
-   导航，即在已知路径的情况下，控制小车运动的方向，到达目标点。并在前进遇到的障碍时进行报错
+   导航，即在已知路径的情况下，控制小车运动的方向，到达目标点。并在前进遇到的障碍时进行报错。
+
+   航向
 
 4. 
 
